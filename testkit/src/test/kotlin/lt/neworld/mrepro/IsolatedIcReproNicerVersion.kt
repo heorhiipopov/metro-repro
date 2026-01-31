@@ -51,6 +51,24 @@ class IsolatedIcReproNicerVersion {
         assertEquals(nonIncrementalStatus,incrementalStatus)
     }
 
+    @Test
+    fun testNoInterfaceControl() {
+        setupProjectNoInterface()
+
+        println("Running control: no interface")
+
+        // 1. Control (Non-IC)
+        val nonIncrementalStatus = runScenario(incremental = false)
+        // 2. Test (IC)
+        val incrementalStatus = runScenario(incremental = true)
+
+        println("Final control comparison:")
+        println("NON-INCREMENTAL: $nonIncrementalStatus")
+        println("INCREMENTAL: $incrementalStatus")
+
+        assertEquals(nonIncrementalStatus, incrementalStatus)
+    }
+
     private fun runScenario(incremental: Boolean): String {
         val mode = if (incremental) "INCREMENTAL" else "NON-INCREMENTAL"
         println("Starting Scenario: $mode")
@@ -214,6 +232,34 @@ class IsolatedIcReproNicerVersion {
                 val userService: UserService 
             }
         """.trimIndent())
+    }
+
+    private fun setupProjectNoInterface() {
+        setupProject()
+
+        writeFile("feature/src/main/kotlin/com/example/feature/UserService.kt", """
+        package com.example.feature
+        import com.example.api.UserApi
+        import com.example.core.AppScope
+        import dev.zacsweers.metro.Inject
+        
+        @AppScope
+        class UserService @Inject constructor(
+            private val userApi: UserApi
+        ) {
+            fun doWork() = userApi.getCurrentUser()
+        }
+    """.trimIndent())
+
+        val implFile = tempProjectDir.resolve("feature/src/main/kotlin/com/example/feature/UserServiceImpl.kt")
+        if (implFile.exists()){
+            implFile.delete()
+        }
+
+        val sessionModuleFile = tempProjectDir.resolve("feature/src/main/kotlin/com/example/feature/SessionModule.kt")
+        if (sessionModuleFile.exists()) {
+            sessionModuleFile.delete()
+        }
     }
 
     private val moduleOriginal = """
