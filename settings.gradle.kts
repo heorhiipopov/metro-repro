@@ -50,6 +50,7 @@ include(
     "features:feature0",
     "features:feature1",
     "features:feature2",
+    "testkit",
 )
 
 rootProject.name = "metro-repro"
