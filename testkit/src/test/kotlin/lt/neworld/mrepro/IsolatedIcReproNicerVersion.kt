@@ -116,31 +116,56 @@ class IsolatedIcReproNicerVersion {
         """.trimIndent())
 
         writeFile("core/build.gradle.kts", """
-            plugins { kotlin("jvm"); id("dev.zacsweers.metro") }
-            dependencies { implementation("dev.zacsweers.metro:runtime:0.10.2") }
+            plugins { 
+                kotlin("jvm")
+                id("dev.zacsweers.metro")
+            }
+            
+            dependencies { 
+                implementation("dev.zacsweers.metro:runtime:0.10.2")
+            }
         """.trimIndent())
 
         writeFile("core/src/main/kotlin/com/example/core/Scopes.kt", """
             package com.example.core
             import dev.zacsweers.metro.Scope
-            @Scope @Retention(AnnotationRetention.RUNTIME) annotation class AppScope
-            @Scope @Retention(AnnotationRetention.RUNTIME) annotation class OtherScope
+            
+            @Scope 
+            @Retention(AnnotationRetention.RUNTIME) 
+            annotation class AppScope
+            
+            @Scope 
+            @Retention(AnnotationRetention.RUNTIME)
+            annotation class OtherScope
         """.trimIndent())
 
         writeFile("api/build.gradle.kts", "plugins { kotlin(\"jvm\") }")
         writeFile("api/src/main/kotlin/com/example/api/Types.kt", """
             package com.example.api
-            interface UserApi { fun getCurrentUser(): String }
+            
+            interface UserApi { 
+                fun getCurrentUser(): String 
+            }
         """.trimIndent())
 
         writeFile("feature/build.gradle.kts", """
-            plugins { kotlin("jvm"); id("dev.zacsweers.metro") }
-            dependencies { implementation(project(":core")); implementation(project(":api")) }
+            plugins { 
+                kotlin("jvm")
+                id("dev.zacsweers.metro")
+            }
+            
+            dependencies { 
+                implementation(project(":core"))
+                implementation(project(":api"))
+            }
         """.trimIndent())
 
         writeFile("feature/src/main/kotlin/com/example/feature/UserService.kt", """
             package com.example.feature
-            interface UserService { fun doWork(): String }
+            
+            interface UserService { 
+                fun doWork(): String 
+            }
         """.trimIndent())
 
         writeFile("feature/src/main/kotlin/com/example/feature/UserServiceImpl.kt", """
@@ -148,6 +173,7 @@ class IsolatedIcReproNicerVersion {
             import com.example.api.UserApi
             import com.example.core.AppScope
             import dev.zacsweers.metro.Inject
+            
             @AppScope
             class UserServiceImpl @Inject constructor(private val userApi: UserApi) : UserService {
                 override fun doWork() = userApi.getCurrentUser()
@@ -158,9 +184,12 @@ class IsolatedIcReproNicerVersion {
             package com.example.feature
             import com.example.core.AppScope
             import dev.zacsweers.metro.*
-            @BindingContainer @ContributesTo(AppScope::class)
+            
+            @BindingContainer 
+            @ContributesTo(AppScope::class)
             abstract class SessionModule {
-                @Binds abstract fun bindUserService(impl: UserServiceImpl): UserService
+                @Binds 
+                abstract fun bindUserService(impl: UserServiceImpl): UserService
             }
         """.trimIndent())
 
@@ -196,7 +225,8 @@ class IsolatedIcReproNicerVersion {
         @BindingContainer 
         @ContributesTo(AppScope::class)
         object UserApiModule {
-            @Provides fun provideUserApi(): UserApi = object : UserApi { override fun getCurrentUser() = "user" }
+            @Provides 
+            fun provideUserApi(): UserApi = object : UserApi { override fun getCurrentUser() = "user" }
         }
     """.trimIndent()
 
@@ -205,9 +235,12 @@ class IsolatedIcReproNicerVersion {
         import com.example.api.UserApi
         import com.example.core.OtherScope
         import dev.zacsweers.metro.*
-        @BindingContainer @ContributesTo(OtherScope::class)
+        
+        @BindingContainer 
+        @ContributesTo(OtherScope::class)
         object UserApiModule {
-            @Provides fun provideUserApi(): UserApi = object : UserApi { override fun getCurrentUser() = "user" }
+            @Provides 
+            fun provideUserApi(): UserApi = object : UserApi { override fun getCurrentUser() = "user" }
         }
     """.trimIndent()
 
@@ -215,9 +248,11 @@ class IsolatedIcReproNicerVersion {
         package com.example.feature
         import com.example.api.UserApi
         import dev.zacsweers.metro.*
+        
         @BindingContainer
         object UserApiModule {
-            @Provides fun provideUserApi(): UserApi = object : UserApi { override fun getCurrentUser() = "user" }
+            @Provides 
+            fun provideUserApi(): UserApi = object : UserApi { override fun getCurrentUser() = "user" }
         }
     """.trimIndent()
 
